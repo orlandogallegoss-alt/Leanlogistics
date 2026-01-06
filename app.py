@@ -35,7 +35,7 @@ else:
     """
 
     # Probamos con la versión 'latest' que suele resolver el error NotFound
-model = genai.GenerativeModel('gemini-1.5-flash-latest', system_instruction=system_prompt)
+model = genai.GenerativeModel('gemini-1.5-pro', system_instruction=system_prompt)
 
 if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": "Equipo, el reporte de hoy indica fluctuaciones térmicas en las cámaras. ¿Cuál es su plan de contingencia aplicando Lean?"}]
@@ -53,4 +53,5 @@ for message in st.session_state.messages:
             response = model.generate_content(prompt)
             st.markdown(response.text)
             st.session_state.messages.append({"role": "assistant", "content": response.text})
+
 
