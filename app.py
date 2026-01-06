@@ -22,7 +22,7 @@ else:
     CONTEXTO DE LA EMPRESA:
     - Manejas 3 SKUs: Zarzamora Fresh, Fresa Frozen, Arándano Premium.
     - El Lead Time promedio de cosecha a empaque es de 4 horas.
-    - El costo por palé perdido por ruptura de cadena de frío es de $4,500 USD.
+    - El costo por pallet perdido por ruptura de cadena de frío es de $4,500 USD.
 
     ESCENARIO BANI (Enero 2026): 
     - Incomprensible: Las temperaturas en la región de Los Reyes han subido 5 grados por encima del promedio histórico, afectando la maduración acelerada.
@@ -34,7 +34,8 @@ else:
     3. Dirígelos con su profesor de 'Administración de Almacenes' o 'Logística de Transporte' si no saben calcular el stock de seguridad para productos perecederos.
     """
 
-    model = genai.GenerativeModel('gemini-1.5-flash', system_instruction=system_prompt)
+    # Probamos con la versión 'latest' que suele resolver el error NotFound
+model = genai.GenerativeModel('gemini-1.5-flash-latest', system_instruction=system_prompt)
 
     if "messages" not in st.session_state:
         st.session_state.messages = [{"role": "assistant", "content": "Equipo, el reporte de hoy indica fluctuaciones térmicas en las cámaras. ¿Cuál es su plan de contingencia aplicando Lean?"}]
