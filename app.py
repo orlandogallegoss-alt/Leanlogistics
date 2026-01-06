@@ -8,14 +8,16 @@ st.sidebar.markdown("### Caso: Berries del Sol Michoacano")
 st.sidebar.info("Ubicación: Los Reyes / Zamora. Mercado: Exportación Global.")
 
 # --- CONFIGURACIÓN DE LA API ---
-GOOGLE_API_KEY = "AIzaSyAuKzzCt3Lmn1Kw78xKxT9uUTkeiJQWNX0" # Tu llave configurada
+# Nota: En producción, usa st.secrets para mayor seguridad
+GOOGLE_API_KEY = "AIzaSyAuKzzCt3Lmn1Kw78xKxT9uUTkeiJQWNX0" 
 
 if not GOOGLE_API_KEY or GOOGLE_API_KEY == "PEGA_AQUÍ_TU_LLAVE":
     st.error("Configura tu API Key.")
 else:
+    # 1. Configurar la API primero
     genai.configure(api_key=GOOGLE_API_KEY)
 
-    # --- PROMPT CON CONTEXTO DE BERRIES ---
+    # 2. Definir el Prompt (DENTRO DEL ELSE)
     system_prompt = """
     Eres un Mentor Senior en Lean Logistics especializado en la agroindustria de Michoacán.
     
@@ -34,24 +36,33 @@ else:
     3. Dirígelos con su profesor de 'Administración de Almacenes' o 'Logística de Transporte' si no saben calcular el stock de seguridad para productos perecederos.
     """
 
-    # Probamos con la versión 'latest' que suele resolver el error NotFound
-model = genai.GenerativeModel('gemini-1.5-pro', system_instruction=system_prompt)
+    # 3. Inicializar el Modelo (DENTRO DEL ELSE)
+    # Usamos 'gemini-1.5-flash' que es el nombre estándar más compatible
+    try:
+        model = genai.GenerativeModel(
+            model_name='gemini-1.5-flash', 
+            system_instruction=system_prompt
+        )
 
-if "messages" not in st.session_state:
-        st.session_state.messages = [{"role": "assistant", "content": "Equipo, el reporte de hoy indica fluctuaciones térmicas en las cámaras. ¿Cuál es su plan de contingencia aplicando Lean?"}]
+        # --- LÓGICA DEL CHAT ---
+        if "messages" not in st.session_state:
+            st.session_state.messages = [{"role": "assistant", "content": "Equipo, el reporte de hoy indica fluctuaciones térmicas en las cámaras. ¿Cuál es su plan de contingencia aplicando Lean?"}]
 
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"])
 
-    if prompt := st.chat_input("Ingresa tu análisis o solicitud de datos..."):
-        st.session_state.messages.append({"role": "user", "content": prompt})
-        with st.chat_message("user"):
-            st.markdown(prompt)
+        if prompt := st.chat_input("Ingresa tu análisis o solicitud de datos..."):
+            st.session_state.messages.append({"role": "user", "content": prompt})
+            with st.chat_message("user"):
+                st.markdown(prompt)
 
-        with st.chat_message("assistant"):
-            response = model.generate_content(prompt)
-            st.markdown(response.text)
-            st.session_state.messages.append({"role": "assistant", "content": response.text})
-
-
+            with st.chat_message("assistant"):
+                # Generar contenido
+                response = model.generate_content(prompt)
+                st.markdown(response.text)
+                st.session_state.messages.append({"role": "assistant", "content": response.text})
+                
+    except Exception as e:
+        st.error(f"Hubo un error con el modelo de IA: {e}")
+        st.info("Sugerencia: Verifica que la API Key tenga acceso a Gemini 1.5 Flash en Google AI Studio.")
