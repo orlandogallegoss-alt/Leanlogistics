@@ -95,3 +95,4 @@ if prompt := st.chat_input("Ingresa tu análisis técnico..."):
             st.session_state.messages.append({"role": "assistant", "content": response.text})
         except Exception as e:
             st.error(f"Error en generación: {e}")
+
